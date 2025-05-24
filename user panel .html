@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SASUKEE - User Panel</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: #111; color: white; }
+    .card { background: #222; padding: 20px; margin: 20px auto; width: 90%; max-width: 400px; border-radius: 12px; }
+    input { padding: 10px; width: 70%; }
+    button { padding: 10px 20px; background: #09f; color: white; border: none; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>SASUKEE Prediction Panel</h1>
+  <div class="card">
+    <input id="accessKey" placeholder="Enter Access Key" />
+    <button onclick="login()">Login</button>
+  </div>
+  <div class="card" id="resultPanel" style="display:none;"></div>
+  <script>
+    async function login() {
+      const key = document.getElementById('accessKey').value;
+      const res = await fetch('http://localhost:3000/api/validate-key', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ key })
+      });
+      if (!res.ok) return alert('Invalid Key');
+      document.getElementById('resultPanel').style.display = 'block';
+      const result = await (await fetch('http://localhost:3000/api/result')).json();
+      const prediction = await (await fetch('http://localhost:3000/api/predict')).json();
+      document.getElementById('resultPanel').innerHTML = `
+        <h2>Latest Result</h2>
+        <p>Period: ${result.period}</p>
+        <p>Number: ${result.number}</p>
+        <p>Size: ${result.size}</p>
+        <h2>Prediction</h2>
+        <p>Predicted Number: ${prediction.predictedNumber}</p>
+        <p>Prediction: ${prediction.prediction}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
